@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        ">
+	<context:property-placeholder location="classpath*:*.properties" />
+
+	<bean id="datasource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/manuscript?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="username" value="root" />
+		<property name="password" value="" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="datasource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+			</props>
+		</property>
+		<property name="packagesToScan" value="com.yang.software.mm" />
+	</bean>
+
+	<bean name="openSessionInViewInterceptor"
+		class="org.springframework.orm.hibernate3.support.OpenSessionInViewInterceptor">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="userDao" class="com.yang.software.mm.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="userService" class="com.yang.software.mm.service.impl.UserServiceImpl">
+		<property name="userDao" ref="userDao" />
+	</bean>
+
+	<bean id="recordDao" class="com.yang.software.mm.dao.impl.RecordDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="manuscriptDao" class="com.yang.software.mm.dao.impl.ManuscriptDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="manuscriptService" class="com.yang.software.mm.service.impl.ManuscriptServiceImpl">
+		<property name="recordDao" ref="recordDao" />
+		<property name="manuscriptDao" ref="manuscriptDao" />
+		<property name="userDao" ref="userDao" />
+		<property name="sectionDao" ref="sectionDao" />
+	</bean>
+	
+	<bean id="sectionDao" class="com.yang.software.mm.dao.impl.SectionDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="sectionService" class="com.yang.software.mm.service.impl.SectionServiceImpl">
+        <property name="sectionDao" ref="sectionDao" />
+    </bean>
+
+	<bean id="loginController" class="com.yang.software.mm.web.contorller.LoginController">
+		<property name="userService" ref="userService" />
+		<property name="manuscriptService" ref="manuscriptService" />
+	</bean>
+
+	<bean id="userController" class="com.yang.software.mm.web.contorller.UserController">
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<bean id="frameController" class="com.yang.software.mm.web.contorller.FrameController">
+	</bean>
+
+	<bean id="manuscriptController" class="com.yang.software.mm.web.contorller.ManuscriptController">
+		<property name="manuscriptService" ref="manuscriptService" />
+		<property name="userService" ref="userService" />
+		<property name="sectionService" ref="sectionService" />
+	</bean>
+	
+	<bean id="sectionController" class="com.yang.software.mm.web.contorller.SectionController">
+	   <property name="sectionService" ref="sectionService" />
+    </bean>
+</beans>
