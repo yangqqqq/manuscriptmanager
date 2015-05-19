@@ -1,0 +1,62 @@
+CREATE SCHEMA `manuscript` DEFAULT CHARACTER SET utf8 ;
+
+CREATE TABLE `manuscript`.`user` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE `manuscript`.`section` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `sectionName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE `manuscript`.`manuscript` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `userid` INT NULL,
+  `date` DATETIME NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE `manuscript`.`record` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `operid` INT NOT NULL,
+  `ownerid` INT NOT NULL,
+  `optype` INT NOT NULL,
+  `content` LONGTEXT NOT NULL,
+  `lastopid` INT NOT NULL,
+  `opdate` DATETIME NOT NULL,
+  `factoryid` INT NOT NULL,
+  `manuscriptId` INT NOT NULL,
+  `sectionId` INT NOT NULL,
+  `publishTime` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+INSERT INTO `manuscript`.`user` (`name`, `password`) VALUES ('admin', 'admin');
+
+ALTER TABLE `manuscript`.`record` 
+ADD COLUMN `publishYear` INT NOT NULL AFTER `publishTime`,
+ADD COLUMN `count` VARCHAR(100) NOT NULL AFTER `publishYear`;
+
+ALTER TABLE `manuscript`.`user` 
+ADD COLUMN `roleId` INT NOT NULL AFTER `password`;
+
+ALTER TABLE `manuscript`.`record` 
+ADD COLUMN `remark` VARCHAR(500) NOT NULL AFTER `count`;
+
+INSERT INTO `manuscript`.`section` (`id`, `sectionName`) VALUES ('0', '未分组栏目');
+UPDATE `manuscript`.`section` SET `id`='0' WHERE `id`='1';
+
+ALTER TABLE `manuscript`.`section` 
+ADD COLUMN `hidden` INT(1) NOT NULL AFTER `sectionName`;
