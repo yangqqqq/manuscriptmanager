@@ -1,4 +1,4 @@
-package com.yang.software.mm.web.contorller;
+package com.yang.software.mm.web.controller;
 
 import com.yang.software.mm.data.record.Record;
 import com.yang.software.mm.data.section.Section;
@@ -56,9 +56,13 @@ public class ManuscriptController extends SimpleFormController {
     @RequestMapping(value = "manuscriptAddInit")
     public ModelAndView manuscriptAddInit(HttpServletRequest request,
                                           HttpServletResponse response, Object command) {
+        Map<String, Object> result = new HashMap<String, Object>();
         List<Section> sections = sectionService.getAll();
-        System.out.println("asd");
-        return new ModelAndView("../../jsp/manuscript/ManuscriptAdd", "command", sections);
+        User user = userService.get(SessionCache.getSessionValue().getUserId());
+        FactoryTypeEnum[] factorys = RoleEnum.getFactoryTypeEnum(user.getRoleId());
+        result.put("sections", sections);
+        result.put("factorys", factorys);
+        return new ModelAndView("../../jsp/manuscript/ManuscriptAdd", result);
     }
 
     @RequestMapping(value = "manuscriptEditInit")
@@ -73,6 +77,9 @@ public class ManuscriptController extends SimpleFormController {
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("command", form);
         result.put("sections", sections);
+        User user = userService.get(SessionCache.getSessionValue().getUserId());
+        FactoryTypeEnum[] factorys = RoleEnum.getFactoryTypeEnum(user.getRoleId());
+        result.put("factorys", factorys);
         return new ModelAndView("../../jsp/manuscript/ManuscriptEdit", result);
     }
 
@@ -84,7 +91,7 @@ public class ManuscriptController extends SimpleFormController {
         command.setOwnerId(SessionCache.getSessionValue().getUserId());
         command.setOpType(MmOpTypeEnum.MODIFY.getId());
         manuscriptService.modify(command);
-        return new ModelAndView("redirect:/manuscriptMainBack");
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptAdd")
@@ -98,29 +105,7 @@ public class ManuscriptController extends SimpleFormController {
         command.setOpType(MmOpTypeEnum.ADD.getId());
 
         manuscriptService.add(command);
-        return new ModelAndView("redirect:/manuscriptMainBack");
-    }
-
-    @RequestMapping(value = "manuscriptMainAll")
-    public ModelAndView manuscriptMainAll(HttpServletRequest request,
-                                          HttpServletResponse response, ManuscriptForm command) {
-        List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
-        List<ManuscriptListForm> forms = manuscriptService.getManuscriptList();
-        for (ManuscriptListForm manuscriptListForm : forms) {
-            if (manuscriptListForm.getFactoryId() != FactoryTypeEnum.PUBLISHED.getId()) {
-                result.add(manuscriptListForm);
-            }
-        }
-        SessionCache.put(SessionCacheKey.MANUSCRIPT_LIST_TYPE, 2);
-        User user = userService.get(SessionCache.getSessionValue().getUserId());
-        SessionCache.put(SessionCacheKey.MANUSCRIPT_OPTYPE_LIST, RoleEnum.getMmOpTypeEnumOfAll(user.getRoleId()));
-        Map<String, Object> commandMap = new HashMap<String, Object>();
-        commandMap.put("opTypes", SessionCache.get(SessionCacheKey.MANUSCRIPT_OPTYPE_LIST));
-        commandMap.put("command", result);
-        List<Section> sections = sectionService.getAll();
-        commandMap.put("sections", sections);
-        SessionCache.remove(SessionCacheKey.MANUSCRIPT_FACTORY_TYPE);
-        return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptMainMy")
@@ -146,42 +131,17 @@ public class ManuscriptController extends SimpleFormController {
         return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
     }
 
-    @RequestMapping(value = "manuscriptMainOfFactory")
-    public ModelAndView manuscriptMainOfFactory(HttpServletRequest request,
-                                                HttpServletResponse response) {
-        int manuscriptListType = (Integer) SessionCache.get(SessionCacheKey.MANUSCRIPT_LIST_TYPE);
-        SessionCache.put(SessionCacheKey.MANUSCRIPT_FACTORY_TYPE, Integer.valueOf(request.getParameter("factoryId")));
-        List<ManuscriptListForm> forms = manuscriptService.getManuscriptListOfFactory(Integer.valueOf(request.getParameter("factoryId")), manuscriptListType);
-        Map<String, Object> commandMap = new HashMap<String, Object>();
-        commandMap.put("command", forms);
-        commandMap.put("opTypes", SessionCache.get(SessionCacheKey.MANUSCRIPT_OPTYPE_LIST));
-        commandMap.put("listType", (Integer) SessionCache.get(SessionCacheKey.MANUSCRIPT_LIST_TYPE) == 1 ? "myList" : "");
-        List<Section> sections = sectionService.getAll();
-        commandMap.put("sections", sections);
-        return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
-    }
-
     @RequestMapping(value = "manuscriptMainBack")
     public ModelAndView manuscriptMainBack(HttpServletRequest request,
                                            HttpServletResponse response) {
-        int manuscriptListType = (Integer) SessionCache.get(SessionCacheKey.MANUSCRIPT_LIST_TYPE);
-        Integer factoryType = (Integer) SessionCache.get(SessionCacheKey.MANUSCRIPT_FACTORY_TYPE);
-        List<ManuscriptListForm> forms;
-        if (factoryType != null) {
-            forms = manuscriptService.getManuscriptListOfFactory(factoryType, manuscriptListType);
-        } else {
-            if (manuscriptListType == 1) {
-                forms = manuscriptService.getManuscriptList(SessionCache.getSessionValue().getUserId());
-            } else {
-                forms = manuscriptService.getManuscriptList();
-            }
-        }
+        List<ManuscriptListForm> result = manuscriptService.getManuscriptList(SessionCache.getSessionValue().getSearchCondition());
         Map<String, Object> commandMap = new HashMap<String, Object>();
-        commandMap.put("command", forms);
-        commandMap.put("opTypes", SessionCache.get(SessionCacheKey.MANUSCRIPT_OPTYPE_LIST));
-        commandMap.put("listType", (Integer) SessionCache.get(SessionCacheKey.MANUSCRIPT_LIST_TYPE) == 1 ? "myList" : "");
+        commandMap.put("opTypes", RoleEnum.getMmOpTypeEnumOfAll(0));
+        commandMap.put("command", result);
         List<Section> sections = sectionService.getAll();
         commandMap.put("sections", sections);
+        commandMap.put("publishYear", this.getPublishYears());
+        commandMap.put("condition", SessionCache.getSessionValue().getSearchCondition());
         return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
     }
 
@@ -363,6 +323,36 @@ public class ManuscriptController extends SimpleFormController {
         return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
     }
 
+    @RequestMapping(value = "manuscriptList")
+    public ModelAndView manuscriptList(HttpServletRequest request,
+                                               HttpServletResponse response) {
+        resetSearchCondtion(request);
+        List<ManuscriptListForm> result = filterRecyle(manuscriptService.getManuscriptList(SessionCache.getSessionValue().getSearchCondition()));
+
+        Map<String, Object> commandMap = new HashMap<String, Object>();
+        commandMap.put("opTypes", RoleEnum.getMmOpTypeEnumOfAll(0));
+        commandMap.put("command", result);
+        List<Section> sections = sectionService.getAll();
+        commandMap.put("sections", sections);
+        commandMap.put("publishYear", this.getPublishYears());
+        commandMap.put("condition", SessionCache.getSessionValue().getSearchCondition());
+        return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
+    }
+
+    private List<ManuscriptListForm> filterRecyle(List<ManuscriptListForm> manuscriptListForms) {
+        boolean isFilter = SessionCache.getSessionValue().getSearchCondition().isRecyle();
+        List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
+        for (ManuscriptListForm form : manuscriptListForms)
+        {
+            if ((isFilter && form.getOpType() == 2)
+                    || !isFilter && form.getOpType() != 2)
+            {
+                result.add(form);
+            }
+        }
+        return result;
+    }
+
     private void deleteManuscript(String[] ids) {
         for (String id : ids) {
             manuscriptService.delete(Integer.valueOf(id));
@@ -375,5 +365,54 @@ public class ManuscriptController extends SimpleFormController {
         }
     }
 
+    private int[] getPublishYears()
+    {
+        Date now = new Date();
+        int realYear = 1900 + now.getYear();
+        int[] result = new int[realYear + 2 - 2014];
+        for (int i = 0; i < result.length; i++)
+        {
+            result[i] = 2014 + i;
+        }
+        return result;
+    }
 
+    private void resetSearchCondtion(HttpServletRequest request)
+    {
+        String ownerId = request.getParameter("ownerId");
+        if (null != ownerId)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setOwnerId(ownerId);
+        }
+        String section = request.getParameter("section");
+        if (null != section)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setSection(section);
+        }
+        String publishTime = request.getParameter("publishTime");
+        if (null != publishTime)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setPublishTime(publishTime);
+        }
+        String publishYear = request.getParameter("publishYear");
+        if (null != publishYear)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setPublishYear(publishYear);
+        }
+        String content = request.getParameter("content");
+        if (null != content)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setContent(content);
+        }
+        String isRecyle = request.getParameter("isRecyle");
+        if (null != isRecyle)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setRecyle(Boolean.valueOf(isRecyle));
+        }
+        String[] factoryIds = request.getParameterValues("factoryId");
+        if (factoryIds != null)
+        {
+            SessionCache.getSessionValue().getSearchCondition().setFactoryIds(factoryIds);
+        }
+    }
 }

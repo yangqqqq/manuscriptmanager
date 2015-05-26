@@ -5,6 +5,8 @@ public class SessionValue {
 
     private int userId;
 
+    private SearchCondition searchCondition = new SearchCondition();
+
     public String getUserName() {
         return userName;
     }
@@ -21,10 +23,16 @@ public class SessionValue {
         this.userId = userId;
     }
 
-    @Override
-    public String toString() {
-        return "SessionValue [userName=" + userName + ", userId=" + userId
-                + "]";
+    public SearchCondition getSearchCondition() {
+        return searchCondition;
     }
 
+    @Override
+    public String toString() {
+        return "SessionValue{" +
+                "userName='" + userName + '\'' +
+                ", userId=" + userId +
+                ", searchCondition=" + searchCondition +
+                '}';
+    }
 }

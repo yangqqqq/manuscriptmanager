@@ -1,4 +1,4 @@
-package com.yang.software.mm.web.contorller;
+package com.yang.software.mm.web.controller;
 
 import com.yang.software.mm.data.session.SessionCache;
 import com.yang.software.mm.data.session.SessionCacheKey;
@@ -50,10 +50,9 @@ public class LoginController extends SimpleFormController {
         return new ModelAndView("redirect:/loginPage");
     }
 
-    @RequestMapping(value = "loginPage")
-    public ModelAndView loginPage(HttpServletRequest request,
-                                  HttpServletResponse response) {
-        return new ModelAndView("../../jsp/login1/Login");
+    @RequestMapping(value = "/loginPage")
+    public ModelAndView loginPage(HttpServletRequest request,                                  HttpServletResponse response) {
+        return new ModelAndView("../../jsp/login/Login");
     }
 
     public UserService getUserService() {

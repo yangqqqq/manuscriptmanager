@@ -1,4 +1,6 @@
 <%@page import="com.yang.software.mm.enums.FactoryTypeEnum"%>
+<%@ page import="com.yang.software.mm.data.session.SessionCache" %>
+<%@ page import="com.yang.software.mm.data.Constants" %>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
@@ -10,8 +12,13 @@
 <script type="text/javascript">
 function factorySelect(factoryId, aObj)
 {
-	window.parent.document.getElementById("mainFrame").src ="./manuscriptMainOfFactory?factoryId="+factoryId;
+	window.parent.document.getElementById("mainFrame").src ="./manuscriptList?factoryId="+factoryId&+"&isRecyle=false";
 	factoryTypeChange(aObj);
+}
+function factorySelectAll(aObj)
+{
+    window.parent.document.getElementById("mainFrame").src ="./manuscriptList?<%=Constants.ALL_FACTORYID_FILTER%>&isRecyle=false";
+    factoryTypeChange(aObj);
 }
 function listTypeChange(aObj)
 {
@@ -55,10 +62,10 @@ table.leftTable tr td a:hover{ background-color:#357CBF;}
     <td height="34"><a class="listType" target="mainFrame" href="./manuscriptAddInit" onclick="listTypeChange(this)">编写新稿件</a></td>
   </tr>
   <tr>
-    <td height="34"><a class="listType" target="mainFrame" href="./manuscriptMainMy" onclick="listTypeChange(this)" id="myFrameTitle">我的稿件</a></td>
+    <td height="34"><a class="listType" target="mainFrame" href="./manuscriptList?ownerId=<%=SessionCache.getSessionValue().getUserId()%>&<%=Constants.EDIT_WAIT_PUBLISH_FACTORYID_FILTER%>&isRecyle=false" onclick="listTypeChange(this)" id="myFrameTitle">我的稿件</a></td>
   </tr>
   <tr>
-    <td height="34"><a class="listType" target="mainFrame" href="./manuscriptMainAll" onclick="listTypeChange(this)">所有稿件</a></td>
+    <td height="34"><a class="listType" target="mainFrame" href="./manuscriptList?ownerId=<%=Constants.NOT_INIT_NUMBER%>&<%=Constants.EDIT_WAIT_PUBLISH_FACTORYID_FILTER%>&isRecyle=false" onclick="listTypeChange(this)">所有稿件</a></td>
   </tr>
    <tr>
     <td height="34">
@@ -66,10 +73,11 @@ table.leftTable tr td a:hover{ background-color:#357CBF;}
         <c:forEach var="factory" items="<%=FactoryTypeEnum.values() %>">
              <a href="javascript:void(0)" onclick="factorySelect(${factory.id },this)" class="factoryType">${factory.description }</a>
         </c:forEach>
+        <a href="javascript:void(0)" onclick="factorySelectAll(this)" class="factoryType">所有库</a>
      </td>
   </tr>
   <tr>
-    <td><a target="mainFrame" href="manuscriptRecyclerList" class="recyclerType" onclick="recyclerSelected(this)">回收站</a></td>
+    <td><a target="mainFrame" href="./manuscriptList?ownerId=<%=Constants.NOT_INIT_NUMBER%>&<%=Constants.EDIT_WAIT_PUBLISH_FACTORYID_FILTER%>&isRecyle=true" class="recyclerType" onclick="recyclerSelected(this)">回收站</a></td>
   </tr>
 </table>
 </body>

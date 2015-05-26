@@ -16,4 +16,6 @@ public interface RecordDao {
     void delete(int id);
 
     Record getLatestRecord(int manuId);
+
+    List<Record> getRecords(Record condition);
 }

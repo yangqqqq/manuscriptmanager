@@ -1,6 +1,7 @@
 ﻿﻿<%@page import="com.yang.software.mm.data.Constants"%>
 <%@page import="com.yang.software.mm.enums.PublishTimeEnum"%>
 <%@page import="com.yang.software.mm.enums.MmOpTypeEnum"%>
+<%@ page import="java.util.Date" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -9,9 +10,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="css/table.jsp" rel="stylesheet" type="text/css" />
+    <link href="css/table.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="js/table.jsp"></script>
+    <script type="text/javascript" src="js/table.js"></script>
 <style type="text/css">
 table {  
     border: 1px solid #B1CDE3;  
@@ -115,31 +116,12 @@ function opTypeChange(opTypeId)
 }
 function search1()
 {
-	  var table = document.getElementById("tableSort");
-	  var tbody = table.tBodies[0];
-	  var tr = tbody.rows; 
-	  var matchCount = 0;
-	  for (var i = 0 ; i < tr.length; i++)
-	  {
-		  if (isMatch(form.searchContext.value,tr[i].cells[1].innerHTML)
-				  &&isMatch(form.searchSection.value,tr[i].cells[2].innerHTML)
-				  && isMatch(form.searchPublishTime.value,tr[i].cells[7].innerHTML)
-                  && isMatch(form.searchPublishYear.value,tr[i].cells[6].innerHTML))
-		  {
-			  $(tr[i]).css("display","");
-			  matchCount ++;
-		  }
-		  else
-		  {
-			  $(tr[i]).css("display","none");
-		  }
-	  }
-	  $("#manuCount").html(matchCount);
+    document.form.action="./manuscriptList";
+    document.form.submit();
 }
 function search2()
 {
 	search1();
-    setSearchCondtion();
 }
 function isMatch(searchStr, contentStr)
 {
@@ -152,18 +134,8 @@ function isMatch(searchStr, contentStr)
 window.onload = pageInit;
 function pageInit()
 {
-	var sc = $.ajax({url:"./getSearchCondition",async:false});
-	var searchCondition = sc.responseText.split("<%=Constants.SEARCH_CONDITION_SPLIT%>");
-	form.searchContext.value = searchCondition[0];
-	form.searchPublishTime.value = searchCondition[1];
-	form.searchSection.value = searchCondition[2];
-	search1();
-	sortTable('tableSort', 10);
-	sortTable('tableSort', 10);
-}
-function setSearchCondtion()
-{
-	$.ajax({url:"./setSearchCondition?searchContext="+form.searchContext.value+"&searchPublishTime="+form.searchPublishTime.value+"&searchSection="+form.searchSection.value,async:true});
+    sortTable('tableSort', 10);
+    sortTable('tableSort', 10);
 }
 function submitAdvice()
 {
@@ -177,10 +149,9 @@ function submitAdvice()
 }
 function reset()
 {
-	form.searchContext.value="";
-	form.searchSection.value="";
-	form.searchPublishTime.value="";
-	form.searchPublishYear.value="";
+    document.form.content.value="";
+    document.form.publishTime.value="-1";
+    document.form.publishYear.value="-1";
 	search2();
 }
 function setWirtable(inputObj)
@@ -200,25 +171,24 @@ function setWirtable(inputObj)
 </c:forEach>
 共<label id="manuCount">${fn:length(command)}</label>篇
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-按内容查询<input type="text" name="searchContext"/>
-按栏目查询<select name="searchSection">
-        <option value="">请选择</option>
+按内容查询<input type="text" name="content" value="${condition.content}"/>
+按栏目查询<select name="section">
+        <option value="-1">请选择</option>
         <c:forEach var="section" items="${sections}">
-            <c:if test="${section.hidden == 0}"><option value="${section.sectionName}">${section.sectionName}</option></c:if>
+            <c:if test="${section.hidden == 0}"><option value="${section.id}" <c:if test="${section.id == condition.section}">selected="selected" </c:if> >${section.sectionName}</option></c:if>
         </c:forEach>
     </select>
-按期数查询<select name="searchPublishTime">
-<option value="">请选择</option>
+按期数查询<select name="publishTime">
+<option value="-1">请选择</option>
     <c:forEach items="<%=PublishTimeEnum.values() %>" var="period">
-        <option value="${period.description}">${period.description}</option>
+        <option value="${period.id}"  <c:if test="${period.id == condition.publishTime}">selected="selected" </c:if>>${period.description}</option>
     </c:forEach>
     </select>
-    按年份查询<select name="searchPublishYear">
-<option value="">请选择</option>
-        <option value="2014年">2014年</option>
-        <option value="2015年">2015年</option>
-        <option value="2015年">2016年</option>
-        <option value="2015年">2017年</option>
+    按年份查询<select name="publishYear">
+<option value="-1">请选择</option>
+    <c:forEach items="${publishYear}" var="year">
+        <option value="${year}"  <c:if test="${year == condition.publishYear}">selected="selected" </c:if>>${year}</option>
+    </c:forEach>
     </select>
 <a href="javascript:void(0)" onclick="search2();" onkeyup="">搜索</a>
 <a href="javascript:void(0)" onclick="reset();" onkeyup="">重置</a>
@@ -241,10 +211,10 @@ function setWirtable(inputObj)
   </thead>
   <tbody>
        <c:forEach var="manuscript" items="${command}" > 
-          <tr class="manuTr" onclick="manuscriptPreview(${manuscript.manuscriptId},this,'${manuscript.remark}')" <c:if test="${listType == 'myList'}">ondblclick="manuscriptEditInit(${manuscript.manuscriptId})"</c:if>> 
+          <tr class="manuTr" onclick="manuscriptPreview(${manuscript.manuscriptId},this,'${manuscript.remark}')" ondblclick="manuscriptEditInit(${manuscript.manuscriptId})">
           <td width="10px"><input type="checkbox" name="selectId" class="checkbox_selectId" value="${manuscript.manuscriptId}"/>
           </td>
-          <td width="*%"><c:if test="${manuscript.remark != ''}"><label style="color: red">[${manuscript.remark}]</label></c:if><c:out value="${manuscript.summary}" default="" /><input type="hidden" value="${manuscript.content}"/>
+          <td width="*%"><c:if test="${manuscript.remark != ''}"><label style="color: red">[${manuscript.remark}]</label></c:if><c:out value="${manuscript.summary}" default="" />
           </td> 
           <td width="150px"> <c:out value="${manuscript.sectionName}" default=""/> 
           </td>

@@ -2,6 +2,7 @@ package com.yang.software.mm.dao.impl;
 
 import java.util.List;
 
+import com.yang.software.mm.data.Constants;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -12,6 +13,7 @@ import org.springframework.util.Assert;
 
 import com.yang.software.mm.dao.RecordDao;
 import com.yang.software.mm.data.record.Record;
+import utils.StringUtils;
 
 public class RecordDaoImpl implements RecordDao {
 
@@ -42,7 +44,11 @@ public class RecordDaoImpl implements RecordDao {
     }
 
     public List<Record> getAllRecord() {
-        return find();
+        String sql = "select record.*, t.maxId from(select *, max(id) maxId from record group by manuscriptId) t, record where t.maxId = record.id";
+        SQLQuery query = this.getSession().createSQLQuery(sql);
+        query.addEntity(Record.class);
+
+        return query.list();
     }
 
     public void delete(int id) {
@@ -75,6 +81,42 @@ public class RecordDaoImpl implements RecordDao {
         return result.get(0);
     }
 
+    @Override
+    public List<Record> getRecords(Record condition) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(" where 1 = 1");
+        if (Constants.NOT_INIT_NUMBER != condition.getSectionId())
+        {
+            stringBuilder.append(" and record.sectionId = ").append(condition.getSectionId());
+        }
+        if (Constants.NOT_INIT_NUMBER != condition.getPublishTime())
+        {
+            stringBuilder.append(" and record.publishTime = ").append(condition.getPublishTime());
+        }
+        if (Constants.NOT_INIT_NUMBER != condition.getPublishYear())
+        {
+            stringBuilder.append(" and record.publishYear = ").append(condition.getPublishYear());
+        }
+        if (Constants.NOT_INIT_NUMBER != condition.getOwnerId())
+        {
+            stringBuilder.append(" and record.ownerid = ").append(condition.getOwnerId());
+        }
+        if (Constants.NOT_INIT_NUMBER != condition.getManuscriptId())
+        {
+            stringBuilder.append(" and record.manuscriptId = ").append(condition.getManuscriptId());
+        }
+        if (StringUtils.hasText(condition.getContent()))
+        {
+            stringBuilder.append(" and record.content like '%" + condition.getContent() + "%' ");
+        }
+
+        String conditions = stringBuilder.toString();
+        String sql = "select record.*, t.maxId from(select max(id) maxId from record group by manuscriptId) t, (select * from record " + conditions + ")record where t.maxId = record.id";
+        SQLQuery query = this.getSession().createSQLQuery(sql);
+        query.addEntity(Record.class);
+
+        return query.list();
+    }
 
     /**
      * Get the current Session.

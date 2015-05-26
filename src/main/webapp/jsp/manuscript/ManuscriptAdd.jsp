@@ -1,4 +1,5 @@
 <%@page import="com.yang.software.mm.enums.PublishTimeEnum"%>
+<%@ page import="java.util.Date" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
@@ -23,24 +24,24 @@ function showTextLength()
 <body>
 <form name="form" method="post" action="manuscriptAdd" onsubmit="return false;">
     栏目<select name="sectionId">
-        <c:forEach var="section" items="${command}">
+        <c:forEach var="section" items="${sections}">
             <c:if test="${section.hidden == 0}"><option value="${section.id}">${section.sectionName}</option></c:if>
         </c:forEach>
     </select>
     
    年份<select name="publishYear">
-    <option value="2013">2013</option>
-    <option value="2014" selected="selected">2014</option>
-    <option value="2015">2015</option>
-    <option value="2016">2016</option>
+    <%
+        Date now = new Date();
+        int realYear = 1900 + now.getYear();
+        for (int i = 2014; i <= realYear + 1; i ++) {%>
+    <option value="<%=i%>" <%=i == realYear? "selected='selected'" : ""%>><%=i%></option>
+    <%}%>
    </select>
-   <p style="display:none">
-    版本号<select name="publishTime">
+    期数<select name="publishTime">
     <c:forEach var="publishTime" items="<%=PublishTimeEnum.values() %>">
         <option value="${publishTime.id }">${publishTime.description}</option>
     </c:forEach>
     </select>
-    </p>
 备注<input name="count"/>
 <input type="hidden" name="remark">
     <br/>

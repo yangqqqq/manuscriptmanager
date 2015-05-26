@@ -1,4 +1,4 @@
-package com.yang.software.mm.web.contorller;
+package com.yang.software.mm.web.controller;
 
 import com.yang.software.mm.data.section.Section;
 import com.yang.software.mm.service.SectionService;

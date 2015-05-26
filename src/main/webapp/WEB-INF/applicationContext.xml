@@ -67,7 +67,7 @@
 		<property name="userDao" ref="userDao" />
 		<property name="sectionDao" ref="sectionDao" />
 	</bean>
-	
+
 	<bean id="sectionDao" class="com.yang.software.mm.dao.impl.SectionDaoImpl">
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
@@ -76,25 +76,25 @@
         <property name="sectionDao" ref="sectionDao" />
     </bean>
 
-	<bean id="loginController" class="com.yang.software.mm.web.contorller.LoginController">
+	<bean id="loginController" class="com.yang.software.mm.web.controller.LoginController">
 		<property name="userService" ref="userService" />
 		<property name="manuscriptService" ref="manuscriptService" />
 	</bean>
 
-	<bean id="userController" class="com.yang.software.mm.web.contorller.UserController">
+	<bean id="userController" class="com.yang.software.mm.web.controller.UserController">
 		<property name="userService" ref="userService" />
 	</bean>
 
-	<bean id="frameController" class="com.yang.software.mm.web.contorller.FrameController">
+	<bean id="frameController" class="com.yang.software.mm.web.controller.FrameController">
 	</bean>
 
-	<bean id="manuscriptController" class="com.yang.software.mm.web.contorller.ManuscriptController">
+	<bean id="manuscriptController" class="com.yang.software.mm.web.controller.ManuscriptController">
 		<property name="manuscriptService" ref="manuscriptService" />
 		<property name="userService" ref="userService" />
 		<property name="sectionService" ref="sectionService" />
 	</bean>
-	
-	<bean id="sectionController" class="com.yang.software.mm.web.contorller.SectionController">
+
+	<bean id="sectionController" class="com.yang.software.mm.web.controller.SectionController">
 	   <property name="sectionService" ref="sectionService" />
     </bean>
 </beans>

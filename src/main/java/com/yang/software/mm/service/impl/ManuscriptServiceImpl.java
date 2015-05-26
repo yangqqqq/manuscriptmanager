@@ -1,13 +1,8 @@
 package com.yang.software.mm.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.yang.software.mm.data.session.SearchCondition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,28 +149,15 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         List<Record> records = recordDao.getAllRecord();
         List<User> users = userDao.getAllUser();
         List<Section> sections = sectionDao.getAllSection();
-        Map<Integer, ManuscriptListForm> id2ManuscriptMap = new HashMap<Integer, ManuscriptListForm>();
         List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
         for (Record record : records) {
-            if (!id2ManuscriptMap.containsKey(record.getManuscriptId())) {
-                ManuscriptListForm form = new ManuscriptListForm(record);
-                form.setAutherId(manuscripts.get(record.getManuscriptId()).getUserId());
-                form.setAutherName(getUserName(users, form.getAutherId()));
-                form.setOwnerName(getUserName(users, form.getOwnerId()));
-                form.setSectionName(getSectionName(form.getSectionId(), sections));
-                id2ManuscriptMap.put(form.getManuscriptId(), form);
-            } else {
-                if (record.getOpDate().after(id2ManuscriptMap.get(record.getManuscriptId()).getOpDate())) {
-                    ManuscriptListForm form = new ManuscriptListForm(record);
-                    form.setAutherId(manuscripts.get(record.getManuscriptId()).getUserId());
-                    form.setAutherName(getUserName(users, form.getAutherId()));
-                    form.setOwnerName(getUserName(users, form.getOwnerId()));
-                    form.setSectionName(getSectionName(form.getSectionId(), sections));
-                    id2ManuscriptMap.put(form.getManuscriptId(), form);
-                }
-            }
+            ManuscriptListForm form = new ManuscriptListForm(record);
+            form.setAutherId(manuscripts.get(record.getManuscriptId()).getUserId());
+            form.setAutherName(getUserName(users, form.getAutherId()));
+            form.setOwnerName(getUserName(users, form.getOwnerId()));
+            form.setSectionName(getSectionName(form.getSectionId(), sections));
+            result.add(form);
         }
-        result.addAll(id2ManuscriptMap.values());
         return result;
     }
 
@@ -210,11 +192,12 @@ public class ManuscriptServiceImpl implements ManuscriptService {
     }
 
     public ManuscriptListForm getManuscript(int manuscriptId) {
-        List<ManuscriptListForm> forms = getManuscriptListBase();
-        for (ManuscriptListForm manuscriptListForm : forms) {
-            if (manuscriptListForm.getManuscriptId() == manuscriptId) {
-                return manuscriptListForm;
-            }
+        Record condition = Record.getSearchCondition();
+        condition.setManuscriptId(manuscriptId);
+        List<ManuscriptListForm> forms = this.getManuscriptList(condition);
+        if (!forms.isEmpty())
+        {
+            return forms.get(0);
         }
         return null;
     }
@@ -297,5 +280,37 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         }
 
         return map;
+    }
+
+    @Override
+    public List<ManuscriptListForm> getManuscriptList(SearchCondition searchCondition) {
+        List <ManuscriptListForm> list = this.getManuscriptList(searchCondition.getSearchRecordCondtion());
+        List <ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
+        Set<Integer> factoryIdSet = searchCondition.getFactoryIdSet();
+        for (ManuscriptListForm form : list) {
+            if (factoryIdSet.contains(form.getFactoryId()))
+            {
+                result.add(form);
+            }
+        }
+        return result;
+    }
+
+    private List<ManuscriptListForm> getManuscriptList(Record searchCondition)
+    {
+        Map<Integer, Manuscript> manuscripts = this.getId2ManuscriptMap(manuscriptDao.getAllManuscript());
+        List<Record> records = recordDao.getRecords(searchCondition);
+        List<User> users = userDao.getAllUser();
+        List<Section> sections = sectionDao.getAllSection();
+        List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
+        for (Record record : records) {
+            ManuscriptListForm form = new ManuscriptListForm(record);
+            form.setAutherId(manuscripts.get(record.getManuscriptId()).getUserId());
+            form.setAutherName(getUserName(users, form.getAutherId()));
+            form.setOwnerName(getUserName(users, form.getOwnerId()));
+            form.setSectionName(getSectionName(form.getSectionId(), sections));
+            result.add(form);
+        }
+        return result;
     }
 }

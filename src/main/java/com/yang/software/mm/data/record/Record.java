@@ -1,5 +1,7 @@
 package com.yang.software.mm.data.record;
 
+import com.yang.software.mm.data.Constants;
+
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -187,8 +189,35 @@ public class Record {
         super();
     }
 
+
+    public Record(int ownerId,  int sectionId, int publishTime, int publishYear, String content) {
+        super();
+        this.ownerId = ownerId;
+        this.content = content;
+        this.sectionId = sectionId;
+        this.publishTime = publishTime;
+        this.publishYear = publishYear;
+    }
+
     public Record getOpCopy() {
         return new Record(manuscriptId, operId, ownerId, opType, content, id,
                 opDate, factoryId, sectionId, publishTime, publishYear, count, remark);
+    }
+
+    public static Record getSearchCondition()
+    {
+        Record record = new Record();
+        record.manuscriptId = Constants.NOT_INIT_NUMBER;
+        record.operId = Constants.NOT_INIT_NUMBER;
+        record.ownerId = Constants.NOT_INIT_NUMBER;
+        record.opType = Constants.NOT_INIT_NUMBER;
+        record.content = "";
+        record.lastOpId = Constants.NOT_INIT_NUMBER;
+        record.factoryId = Constants.NOT_INIT_NUMBER;
+        record.sectionId = Constants.NOT_INIT_NUMBER;
+        record.publishTime = Constants.NOT_INIT_NUMBER;
+        record.publishYear = Constants.NOT_INIT_NUMBER;
+
+        return record;
     }
 }

@@ -3,6 +3,7 @@ package com.yang.software.mm.service;
 import java.util.List;
 
 import com.yang.software.mm.data.record.Record;
+import com.yang.software.mm.data.session.SearchCondition;
 import com.yang.software.mm.web.form.ManuscriptForm;
 import com.yang.software.mm.web.form.ManuscriptListForm;
 import com.yang.software.mm.web.form.ManuscriptRecordListForm;
@@ -37,4 +38,6 @@ public interface ManuscriptService {
     List<ManuscriptListForm> getManuscriptListOfFactory(int factoryId, int manuscriptListType);
 
     List<ManuscriptListForm> getManuscriptRecyclerList();
+
+    List<ManuscriptListForm> getManuscriptList(SearchCondition searchCondition);
 }

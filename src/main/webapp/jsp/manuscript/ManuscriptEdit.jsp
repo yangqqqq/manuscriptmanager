@@ -38,13 +38,11 @@ window.onload=pageInit;
     <option value="2015" <c:if test="${command.publishYear == 2015}">selected="selected"</c:if>>2015</option>
     <option value="2016" <c:if test="${command.publishYear == 2016}">selected="selected"</c:if>>2016</option>
    </select>
-   <p style="display:none">
-    版本号<select name="publishTime">
+    期数<select name="publishTime">
     <c:forEach var="publishTime" items="<%=PublishTimeEnum.values() %>">
         <option value="${publishTime.id }" <c:if test="${command.publishTime == publishTime.id}">selected="selected"</c:if>>${publishTime.description}</option>
     </c:forEach>
     </select>
-    </p>
 备注<input type="text" name="count" value="${command.count}"/><input type="hidden" name="remark">
  <br/>
       当前字数：<label id="textLengthLabel"></label>

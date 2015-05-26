@@ -1,4 +1,5 @@
 <%@page import="com.yang.software.mm.enums.FactoryTypeEnum"%>
+<%@ page import="com.yang.software.mm.data.session.SessionCache" %>
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -11,7 +12,7 @@
   <frame src="./topFrame" name="topFrame" scrolling="No" noresize="noresize" id="topFrame"/>
   <frameset cols="150,*" frameborder="no" border="0" framespacing="0">
     <frame src="./leftFrame" name="leftFrame" scrolling="No" noresize="noresize" id="leftFrame" bordercolor="#CC0000"/>
-    <frame src="./manuscriptMainOfFactory?factoryId=<%=FactoryTypeEnum.EDIT_ID %>" name="mainFrame" id="mainFrame"/>
+    <frame src="./manuscriptList?ownerId=<%=SessionCache.getSessionValue().getUserId()%>" name="mainFrame" id="mainFrame"/>
     </frameset>
     </frameset>
 </html>

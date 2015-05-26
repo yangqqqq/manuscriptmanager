@@ -13,9 +13,8 @@
    <mvc:resources location="/js/" mapping="/js/**"/>
    <mvc:resources location="/css/" mapping="/css/**"/>
 
-	<bean
-		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
-
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 	<bean id="urlMapping"
 		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
 		<property name="mappings">
@@ -39,9 +38,8 @@
 				<prop key="getSearchCondition">frameController</prop>
 				<prop key="setSearchCondition">frameController</prop>
 				<prop key="manuscriptMain">manuscriptController</prop>
-				<prop key="manuscriptMainAll">manuscriptController</prop>
 				<prop key="manuscriptMainMy">manuscriptController</prop>
-				<prop key="manuscriptMainOfFactory">manuscriptController</prop>
+                <prop key="manuscriptList">manuscriptController</prop>
 				<prop key="manuscriptRecyclerList">manuscriptController</prop>
 				<prop key="manuscriptMainPreview">manuscriptController</prop>
 				<prop key="manuscriptAddInit">manuscriptController</prop>
@@ -99,7 +97,7 @@
 	<bean id="sessionInterceptor" class="com.yang.software.mm.web.interceptor.SessionInterceptor">
 		<property name="mappingURL" value="/**" />
 	</bean>
-	
+
 
 
 </beans>
