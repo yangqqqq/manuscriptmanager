@@ -108,53 +108,6 @@ public class ManuscriptController extends SimpleFormController {
         return new ModelAndView("redirect:/manuscriptList");
     }
 
-    @RequestMapping(value = "manuscriptMainMy")
-    public ModelAndView manuscriptMainMy(HttpServletRequest request,
-                                         HttpServletResponse response, ManuscriptForm command) {
-        List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
-        List<ManuscriptListForm> forms = manuscriptService.getManuscriptList(SessionCache.getSessionValue().getUserId());
-        for (ManuscriptListForm manuscriptListForm : forms) {
-            if (manuscriptListForm.getFactoryId() != FactoryTypeEnum.PUBLISHED.getId()) {
-                result.add(manuscriptListForm);
-            }
-        }
-        SessionCache.put(SessionCacheKey.MANUSCRIPT_LIST_TYPE, 1);
-        User user = userService.get(SessionCache.getSessionValue().getUserId());
-        SessionCache.put(SessionCacheKey.MANUSCRIPT_OPTYPE_LIST, RoleEnum.getMmOpTypeEnumOfMy(user.getRoleId()));
-        Map<String, Object> commandMap = new HashMap<String, Object>();
-        commandMap.put("command", result);
-        commandMap.put("opTypes", SessionCache.get(SessionCacheKey.MANUSCRIPT_OPTYPE_LIST));
-        commandMap.put("listType", "myList");
-        List<Section> sections = sectionService.getAll();
-        commandMap.put("sections", sections);
-        SessionCache.remove(SessionCacheKey.MANUSCRIPT_FACTORY_TYPE);
-        return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
-    }
-
-    @RequestMapping(value = "manuscriptMainBack")
-    public ModelAndView manuscriptMainBack(HttpServletRequest request,
-                                           HttpServletResponse response) {
-        List<ManuscriptListForm> result = manuscriptService.getManuscriptList(SessionCache.getSessionValue().getSearchCondition());
-        Map<String, Object> commandMap = new HashMap<String, Object>();
-        commandMap.put("opTypes", RoleEnum.getMmOpTypeEnumOfAll(0));
-        commandMap.put("command", result);
-        List<Section> sections = sectionService.getAll();
-        commandMap.put("sections", sections);
-        commandMap.put("publishYear", this.getPublishYears());
-        commandMap.put("condition", SessionCache.getSessionValue().getSearchCondition());
-        return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
-    }
-
-    @RequestMapping(value = "manuscriptMain")
-    public ModelAndView manuscriptMain(HttpServletRequest request,
-                                       HttpServletResponse response, Object command) {
-        String url = request.getParameter("url");
-        if (!StringUtils.hasText(url)) {
-            url = "manuscriptMainMy";
-        }
-        return new ModelAndView("../../jsp/manuscript/ManuscriptMain", "url", url);
-    }
-
     @RequestMapping(value = "manuscriptMainPreview")
     public ModelAndView manuscriptMainPreview(HttpServletRequest request,
                                               HttpServletResponse response) {
@@ -177,17 +130,6 @@ public class ManuscriptController extends SimpleFormController {
         return new ModelAndView("../../jsp/manuscript/ManuscriptMainPreview", "content", result.getContent());
     }
 
-    @RequestMapping(value = "manuscriptGet")
-    public ModelAndView manuscriptGet(HttpServletRequest request,
-                                      HttpServletResponse response, ManuscriptOpForm form) {
-        String manuscriptIds = request.getParameter("manuscriptIds");
-        if (!StringUtils.hasText(manuscriptIds)) {
-            return new ModelAndView("../../jsp/manuscript/ManuscriptMainPreview");
-        }
-        String[] ids = manuscriptIds.split(",");
-        return null;
-    }
-
     @RequestMapping(value = "manuscriptOpInit")
     public ModelAndView manuscriptOpInit(HttpServletRequest request,
                                          HttpServletResponse response, ManuscriptOpForm form) {
@@ -196,10 +138,10 @@ public class ManuscriptController extends SimpleFormController {
         switch (opTypeEnum) {
             case DELETE:
                 deleteManuscript(form.getSelectId());
-                return new ModelAndView("redirect:/manuscriptMainBack");
+                return new ModelAndView("redirect:/manuscriptList");
             case GET:
                 getManuscript(form.getSelectId());
-                return new ModelAndView("redirect:/manuscriptMainBack");
+                return new ModelAndView("redirect:/manuscriptList");
             case DELIVER:
                 SessionCache.put(SessionCacheKey.DELIVER_MANUSCRIPT_ID, form.getSelectId());
                 return new ModelAndView("redirect:/manuscriptDeliverInit");
@@ -212,7 +154,7 @@ public class ManuscriptController extends SimpleFormController {
             default:
                 break;
         }
-        return new ModelAndView("redirect:/manuscriptMainBack");
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptDeliverInit")
@@ -237,7 +179,7 @@ public class ManuscriptController extends SimpleFormController {
             manuscriptService.deliver(Integer.valueOf(id), form.getDeliverUserId());
         }
 
-        return new ModelAndView("redirect:/manuscriptMainBack");
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptAdviceInit")
@@ -260,7 +202,7 @@ public class ManuscriptController extends SimpleFormController {
         form.setOpType(MmOpTypeEnum.ADVICE.getId());
 
         manuscriptService.advice(form);
-        return new ModelAndView("redirect:/manuscriptMainBack");
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptPeriodInit")
@@ -280,7 +222,7 @@ public class ManuscriptController extends SimpleFormController {
             }
         }
 
-        return new ModelAndView("redirect:/manuscriptMainBack");
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptTransferInit")
@@ -302,7 +244,7 @@ public class ManuscriptController extends SimpleFormController {
             }
         }
 
-        return new ModelAndView("redirect:/manuscriptMainBack");
+        return new ModelAndView("redirect:/manuscriptList");
     }
 
     @RequestMapping(value = "manuscriptRecordList")
@@ -313,15 +255,6 @@ public class ManuscriptController extends SimpleFormController {
         return new ModelAndView("../../jsp/record/RecordList", "command", result);
     }
 
-    @RequestMapping(value = "manuscriptRecyclerList")
-    public ModelAndView manuscriptRecyclerList(HttpServletRequest request,
-                                               HttpServletResponse response) {
-        List<ManuscriptListForm> result = manuscriptService.getManuscriptRecyclerList();
-        Map<String, Object> commandMap = new HashMap<String, Object>();
-        commandMap.put("opTypes", MmOpTypeEnum.getRecyclerOpType());
-        commandMap.put("command", result);
-        return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
-    }
 
     @RequestMapping(value = "manuscriptList")
     public ModelAndView manuscriptList(HttpServletRequest request,

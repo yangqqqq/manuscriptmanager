@@ -77,9 +77,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
     public void modify(ManuscriptForm manuscriptForm) {
         Record latestRecord = getLatestRecord(manuscriptForm.getManuscriptId());
         Record newRecord = manuscriptForm.getAddRecord(manuscriptForm.getManuscriptId());
-        newRecord.setFactoryId(latestRecord.getFactoryId());
         newRecord.setLastOpId(latestRecord.getId());
         newRecord.setRemark(latestRecord.getRemark());
+        newRecord.setOwnerId(latestRecord.getOwnerId());
         recordDao.add(newRecord);
     }
 
@@ -230,17 +230,6 @@ public class ManuscriptServiceImpl implements ManuscriptService {
             }
         }
         return reslut;
-    }
-
-    public List<ManuscriptListForm> getManuscriptRecyclerList() {
-        List<ManuscriptListForm> manuscriptList = this.getManuscriptListBase();
-        for (Iterator<ManuscriptListForm> iterator = manuscriptList.iterator(); iterator.hasNext(); ) {
-            ManuscriptListForm manuscriptListForm = iterator.next();
-            if (manuscriptListForm.getOpType() != MmOpTypeEnum.DELETE.getId()) {
-                iterator.remove();
-            }
-        }
-        return manuscriptList;
     }
 
     public void period(int manuscriptId, int periodId) {

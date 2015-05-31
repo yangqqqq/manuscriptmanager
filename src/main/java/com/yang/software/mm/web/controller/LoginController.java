@@ -39,7 +39,7 @@ public class LoginController extends SimpleFormController {
                 return new ModelAndView("redirect:/adminMainFrame");
             }
         }
-        return new ModelAndView("../../jsp/login1/Login", "errorInfo", "账号或密码错误");
+        return new ModelAndView("../../jsp/login/Login", "errorInfo", "账号或密码错误");
     }
 
     @RequestMapping(value = "logoff")

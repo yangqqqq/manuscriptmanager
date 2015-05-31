@@ -43,6 +43,11 @@ window.onload=pageInit;
         <option value="${publishTime.id }" <c:if test="${command.publishTime == publishTime.id}">selected="selected"</c:if>>${publishTime.description}</option>
     </c:forEach>
     </select>
+    所在库<select name="factoryId">
+    <c:forEach items="${factorys}" var="factory">
+        <option value="${factory.id }"<c:if test="${command.factoryId == factory.id}">selected="selected"</c:if>>${factory.description}</option>
+    </c:forEach>
+</select>
 备注<input type="text" name="count" value="${command.count}"/><input type="hidden" name="remark">
  <br/>
       当前字数：<label id="textLengthLabel"></label>

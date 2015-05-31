@@ -37,7 +37,5 @@ public interface ManuscriptService {
 
     List<ManuscriptListForm> getManuscriptListOfFactory(int factoryId, int manuscriptListType);
 
-    List<ManuscriptListForm> getManuscriptRecyclerList();
-
     List<ManuscriptListForm> getManuscriptList(SearchCondition searchCondition);
 }

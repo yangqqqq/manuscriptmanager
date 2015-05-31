@@ -35,12 +35,7 @@
 				<prop key="topFrame">frameController</prop>
 				<prop key="leftFrame">frameController</prop>
 				<prop key="rightFrame">frameController</prop>
-				<prop key="getSearchCondition">frameController</prop>
-				<prop key="setSearchCondition">frameController</prop>
-				<prop key="manuscriptMain">manuscriptController</prop>
-				<prop key="manuscriptMainMy">manuscriptController</prop>
                 <prop key="manuscriptList">manuscriptController</prop>
-				<prop key="manuscriptRecyclerList">manuscriptController</prop>
 				<prop key="manuscriptMainPreview">manuscriptController</prop>
 				<prop key="manuscriptAddInit">manuscriptController</prop>
 				<prop key="manuscriptAdd">manuscriptController</prop>
@@ -55,7 +50,6 @@
 				<prop key="manuscriptTransfer">manuscriptController</prop>
                 <prop key="manuscriptPeriodInit">manuscriptController</prop>
                 <prop key="manuscriptPeriod">manuscriptController</prop>
-                <prop key="manuscriptMainBack">manuscriptController</prop>
                 <prop key="manuscriptAdviceInit">manuscriptController</prop>
                 <prop key="manuscriptAdvice">manuscriptController</prop>
 				<prop key="sectionMain">sectionController</prop>

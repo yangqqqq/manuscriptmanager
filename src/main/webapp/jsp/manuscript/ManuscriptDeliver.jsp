@@ -14,7 +14,7 @@ function dataCheck()
 
 function doCancle()
 {
-	document.location="./manuscriptMainMy";
+	document.location="./manuscriptList";
 }
 
 </script>

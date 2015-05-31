@@ -12,7 +12,7 @@
 <script type="text/javascript">
 function factorySelect(factoryId, aObj)
 {
-	window.parent.document.getElementById("mainFrame").src ="./manuscriptList?factoryId="+factoryId&+"&isRecyle=false";
+	window.parent.document.getElementById("mainFrame").src ="./manuscriptList?factoryId="+factoryId+"&isRecyle=false";
 	factoryTypeChange(aObj);
 }
 function factorySelectAll(aObj)
