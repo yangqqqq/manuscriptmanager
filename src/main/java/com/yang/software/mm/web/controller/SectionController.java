@@ -3,16 +3,19 @@ package com.yang.software.mm.web.controller;
 import com.yang.software.mm.data.section.Section;
 import com.yang.software.mm.service.SectionService;
 import com.yang.software.mm.web.form.SectionForm;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import utils.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-
-public class SectionController extends SimpleFormController {
+@Controller
+public class SectionController{
+    @Resource(name = "sectionService")
     private SectionService sectionService;
 
     public SectionService getSectionService() {

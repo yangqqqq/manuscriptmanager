@@ -3,70 +3,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
             http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd              
-            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+        >
 
-   <mvc:resources location="/image/" mapping="/image/**"/>
-   <mvc:resources location="/js/" mapping="/js/**"/>
-   <mvc:resources location="/css/" mapping="/css/**"/>
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
 
-    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
-    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
-	<bean id="urlMapping"
-		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-		<property name="mappings">
-			<props>
-				<prop key="userMain">userController</prop>
-				<prop key="userAddInit">userController</prop>
-				<prop key="userAdd">userController</prop>
-				<prop key="userEditInit">userController</prop>
-				<prop key="userEdit">userController</prop>
-				<prop key="userDelete">userController</prop>
-				<prop key="login">loginController</prop>
-				<prop key="logoff">loginController</prop>
-				<prop key="loginPage">loginController</prop>
-				<prop key="mainFrame">frameController</prop>
-				<prop key="adminMainFrame">frameController</prop>
-				<prop key="adminLeftFrame">frameController</prop>
-				<prop key="keepLive">frameController</prop>
-				<prop key="topFrame">frameController</prop>
-				<prop key="leftFrame">frameController</prop>
-				<prop key="rightFrame">frameController</prop>
-                <prop key="manuscriptList">manuscriptController</prop>
-				<prop key="manuscriptMainPreview">manuscriptController</prop>
-				<prop key="manuscriptAddInit">manuscriptController</prop>
-				<prop key="manuscriptAdd">manuscriptController</prop>
-				<prop key="manuscriptEditInit">manuscriptController</prop>
-				<prop key="manuscriptEdit">manuscriptController</prop>
-				<prop key="manuscriptOpInit">manuscriptController</prop>
-				<prop key="manuscriptDeliverInit">manuscriptController</prop>
-				<prop key="manuscriptDeliver">manuscriptController</prop>
-				<prop key="manuscriptRecordList">manuscriptController</prop>
-				<prop key="manuscriptRecordPreview">manuscriptController</prop>
-				<prop key="manuscriptTransferInit">manuscriptController</prop>
-				<prop key="manuscriptTransfer">manuscriptController</prop>
-                <prop key="manuscriptPeriodInit">manuscriptController</prop>
-                <prop key="manuscriptPeriod">manuscriptController</prop>
-                <prop key="manuscriptAdviceInit">manuscriptController</prop>
-                <prop key="manuscriptAdvice">manuscriptController</prop>
-				<prop key="sectionMain">sectionController</prop>
-				<prop key="sectionAddInit">sectionController</prop>
-				<prop key="sectionAdd">sectionController</prop>
-				<prop key="sectionEditInit">sectionController</prop>
-				<prop key="sectionEdit">sectionController</prop>
-			</props>
-		</property>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
-		<property name="interceptors">
-			<list>
-				<ref bean="openSessionInViewInterceptor" />
-			</list>
-		</property>
-	</bean>
-
+    <mvc:annotation-driven />
+    <context:component-scan base-package="com.yang.software.mm.service" />
+    <context:component-scan base-package="com.yang.software.mm.dao" />
+    <context:component-scan base-package="com.yang.software.mm.web.controller" />
 
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -78,19 +34,6 @@
 		</property>
 	</bean>
 
-	<bean
-		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-		<property name="interceptors">
-			<!-- 多个拦截器,顺序执行 -->
-			<list>
-				<ref bean="sessionInterceptor" />
-			</list>
-		</property>
-	</bean>
-	<!-- 如果不定义mappingURL，则默认拦截所有对Controller的请求 ; 可以使用正则表达式对url进行匹配，从而更细粒度的进行拦截(.*/entryOrJsonController\.do\?action=reg.*); -->
-	<bean id="sessionInterceptor" class="com.yang.software.mm.web.interceptor.SessionInterceptor">
-		<property name="mappingURL" value="/**" />
-	</bean>
 
 
 

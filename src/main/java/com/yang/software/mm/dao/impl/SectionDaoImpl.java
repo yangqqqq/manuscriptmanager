@@ -6,12 +6,17 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.yang.software.mm.dao.SectionDao;
 import com.yang.software.mm.data.section.Section;
 
+import javax.annotation.Resource;
+
+@Component("sectionDao")
 public class SectionDaoImpl implements SectionDao {
+    @Resource(name = "sessionFactory")
     private SessionFactory sessionFactory;
 
     public SessionFactory getSessionFactory() {

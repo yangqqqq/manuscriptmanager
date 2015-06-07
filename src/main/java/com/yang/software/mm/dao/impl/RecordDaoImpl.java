@@ -9,14 +9,18 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.yang.software.mm.dao.RecordDao;
 import com.yang.software.mm.data.record.Record;
 import utils.StringUtils;
 
-public class RecordDaoImpl implements RecordDao {
+import javax.annotation.Resource;
 
+@Component("recordDao")
+public class RecordDaoImpl implements RecordDao {
+    @Resource(name = "sessionFactory")
     private SessionFactory sessionFactory;
 
     public SessionFactory getSessionFactory() {

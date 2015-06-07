@@ -3,6 +3,7 @@ package com.yang.software.mm.service.impl;
 import java.util.*;
 
 import com.yang.software.mm.data.session.SearchCondition;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +24,18 @@ import com.yang.software.mm.web.form.ManuscriptForm;
 import com.yang.software.mm.web.form.ManuscriptListForm;
 import com.yang.software.mm.web.form.ManuscriptRecordListForm;
 
+import javax.annotation.Resource;
+
+@Component("manuscriptService")
+@Transactional
 public class ManuscriptServiceImpl implements ManuscriptService {
-
+    @Resource(name = "manuscriptDao")
     private ManuscriptDao manuscriptDao;
-
+    @Resource(name = "recordDao")
     private RecordDao recordDao;
-
+    @Resource(name = "userDao")
     private UserDao userDao;
-
+    @Resource(name = "sectionDao")
     private SectionDao sectionDao;
 
     public ManuscriptDao getManuscriptDao() {
@@ -76,10 +81,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     public void modify(ManuscriptForm manuscriptForm) {
         Record latestRecord = getLatestRecord(manuscriptForm.getManuscriptId());
-        Record newRecord = manuscriptForm.getAddRecord(manuscriptForm.getManuscriptId());
+        Record newRecord = manuscriptForm.getModifyRecord(manuscriptForm.getManuscriptId());
         newRecord.setLastOpId(latestRecord.getId());
         newRecord.setRemark(latestRecord.getRemark());
-        newRecord.setOwnerId(latestRecord.getOwnerId());
         recordDao.add(newRecord);
     }
 

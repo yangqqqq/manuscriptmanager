@@ -7,13 +7,17 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.yang.software.mm.dao.UserDao;
 import com.yang.software.mm.data.user.User;
 
-public class UserDaoImpl implements UserDao {
+import javax.annotation.Resource;
 
+@Component("userDao")
+public class UserDaoImpl implements UserDao {
+    @Resource(name = "sessionFactory")
     private SessionFactory sessionFactory;
 
     public SessionFactory getSessionFactory() {

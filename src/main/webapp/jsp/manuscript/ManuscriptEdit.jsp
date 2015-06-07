@@ -47,6 +47,12 @@ window.onload=pageInit;
     <c:forEach items="${factorys}" var="factory">
         <option value="${factory.id }"<c:if test="${command.factoryId == factory.id}">selected="selected"</c:if>>${factory.description}</option>
     </c:forEach>
+    </select>
+    所有者<select name="ownerId">
+    <c:forEach items="${users}" var="dUser">
+        <option value="${dUser.id }"<c:if test="${command.ownerId == dUser.id}">selected="selected"</c:if>>${dUser.name}</option>
+    </c:forEach>
+    </select>
 </select>
 备注<input type="text" name="count" value="${command.count}"/><input type="hidden" name="remark">
  <br/>

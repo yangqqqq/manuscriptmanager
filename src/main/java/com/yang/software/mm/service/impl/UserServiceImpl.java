@@ -2,6 +2,7 @@ package com.yang.software.mm.service.impl;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,8 +10,11 @@ import com.yang.software.mm.dao.UserDao;
 import com.yang.software.mm.data.user.User;
 import com.yang.software.mm.service.UserService;
 
+import javax.annotation.Resource;
+@Component("userService")
+@Transactional
 public class UserServiceImpl implements UserService {
-
+    @Resource(name = "userDao")
     private UserDao userDao;
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = true)

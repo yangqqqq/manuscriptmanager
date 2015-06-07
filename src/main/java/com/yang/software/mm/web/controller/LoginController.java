@@ -8,15 +8,19 @@ import com.yang.software.mm.enums.RoleEnum;
 import com.yang.software.mm.service.ManuscriptService;
 import com.yang.software.mm.service.UserService;
 import com.yang.software.mm.web.form.LoginForm;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-public class LoginController extends SimpleFormController {
+@Controller
+public class LoginController{
+    @Resource(name = "userService")
     private UserService userService;
+    @Resource(name = "manuscriptService")
     private ManuscriptService manuscriptService;
 
     @RequestMapping(value = "login")

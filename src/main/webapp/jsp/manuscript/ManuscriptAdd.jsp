@@ -42,6 +42,12 @@ function showTextLength()
         <option value="${publishTime.id }">${publishTime.description}</option>
     </c:forEach>
     </select>
+
+    所在库<select name="factoryId">
+    <c:forEach items="${factorys}" var="factory">
+        <option value="${factory.id }"<c:if test="${1 == factory.id}">selected="selected"</c:if>>${factory.description}</option>
+    </c:forEach>
+    </select>
 备注<input name="count"/>
 <input type="hidden" name="remark">
     <br/>

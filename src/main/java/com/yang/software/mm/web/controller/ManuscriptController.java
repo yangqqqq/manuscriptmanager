@@ -12,19 +12,24 @@ import com.yang.software.mm.service.ManuscriptService;
 import com.yang.software.mm.service.SectionService;
 import com.yang.software.mm.service.UserService;
 import com.yang.software.mm.web.form.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import utils.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-public class ManuscriptController extends SimpleFormController {
+@Controller
+public class ManuscriptController{
+    @Resource(name = "manuscriptService")
     ManuscriptService manuscriptService;
+    @Resource(name = "userService")
     UserService userService;
+    @Resource(name = "sectionService")
     SectionService sectionService;
 
     public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS");
@@ -80,6 +85,14 @@ public class ManuscriptController extends SimpleFormController {
         User user = userService.get(SessionCache.getSessionValue().getUserId());
         FactoryTypeEnum[] factorys = RoleEnum.getFactoryTypeEnum(user.getRoleId());
         result.put("factorys", factorys);
+        List<User> users = userService.getAll();
+        for (Iterator iterator = users.iterator(); iterator.hasNext(); ) {
+            User u = (User) iterator.next();
+            if (u.getName().equals("admin")) {
+                iterator.remove();
+            }
+        }
+        result.put("users", users);
         return new ModelAndView("../../jsp/manuscript/ManuscriptEdit", result);
     }
 
@@ -88,7 +101,6 @@ public class ManuscriptController extends SimpleFormController {
                                        HttpServletResponse response, ManuscriptForm command) {
         command.setOpDate(new Date());
         command.setOperId(SessionCache.getSessionValue().getUserId());
-        command.setOwnerId(SessionCache.getSessionValue().getUserId());
         command.setOpType(MmOpTypeEnum.MODIFY.getId());
         manuscriptService.modify(command);
         return new ModelAndView("redirect:/manuscriptList");
@@ -99,7 +111,6 @@ public class ManuscriptController extends SimpleFormController {
                                       HttpServletResponse response, ManuscriptForm command) {
         command.setOpDate(new Date());
         command.setLastOpId(0);
-        command.setFactoryId(FactoryTypeEnum.EDIT.getId());
         command.setOperId(SessionCache.getSessionValue().getUserId());
         command.setOwnerId(SessionCache.getSessionValue().getUserId());
         command.setOpType(MmOpTypeEnum.ADD.getId());

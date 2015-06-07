@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.yang.software.mm.dao.ManuscriptDao;
@@ -15,7 +16,10 @@ import com.yang.software.mm.data.manuscript.Manuscript;
 import com.yang.software.mm.data.record.Record;
 import com.yang.software.mm.web.form.ManuscriptRecordListForm;
 
+import javax.annotation.Resource;
+@Component("manuscriptDao")
 public class ManuscriptDaoImpl implements ManuscriptDao {
+    @Resource(name = "sessionFactory")
     private SessionFactory sessionFactory;
 
     public SessionFactory getSessionFactory() {

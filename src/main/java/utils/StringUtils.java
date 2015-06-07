@@ -65,4 +65,28 @@ public class StringUtils {
 		}
 		return str.substring(0, length);
 	}
+
+    public static String getInsql(String[] strs)
+    {
+        if (strs == null || strs.length == 0)
+        {
+            return "()";
+        }
+        else if (strs.length == 1)
+        {
+            return "("+strs[0]+")";
+        }
+        else
+        {
+            StringBuilder sb = new StringBuilder("(");
+            sb.append(strs[0]);
+            for (int i = 1; i < strs.length; i++)
+            {
+                sb.append(",").append(strs[i]);
+            }
+            sb.append(")");
+            return  sb.toString();
+        }
+
+    }
 }

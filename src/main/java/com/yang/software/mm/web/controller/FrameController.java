@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @Controller
-public class FrameController extends SimpleFormController {
+public class FrameController{
     @RequestMapping(value = "/mainFrame")
     public ModelAndView mainFrame(HttpServletRequest request,
                                   HttpServletResponse response, Object command) {

@@ -145,4 +145,9 @@ public class ManuscriptForm {
         return new Record(manuscriptId, this.operId, this.operId, this.opType,
                 this.content, 0, this.opDate, this.factoryId, this.sectionId, this.publishTime, this.publishYear, this.count, this.remark);
     }
+
+    public Record getModifyRecord(int manuscriptId) {
+        return new Record(manuscriptId, this.operId, this.ownerId, this.opType,
+                this.content, 0, this.opDate, this.factoryId, this.sectionId, this.publishTime, this.publishYear, this.count, this.remark);
+    }
 }

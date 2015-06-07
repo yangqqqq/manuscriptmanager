@@ -2,6 +2,7 @@ package com.yang.software.mm.service.impl;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,7 +10,11 @@ import com.yang.software.mm.dao.SectionDao;
 import com.yang.software.mm.data.section.Section;
 import com.yang.software.mm.service.SectionService;
 
+import javax.annotation.Resource;
+@Component("sectionService")
+@Transactional
 public class SectionServiceImpl implements SectionService {
+    @Resource(name = "sectionDao")
     private SectionDao sectionDao;
 
     public SectionDao getSectionDao() {
