@@ -3,6 +3,8 @@ package com.yang.software.mm.dao;
 import java.util.List;
 
 import com.yang.software.mm.data.manuscript.Manuscript;
+import com.yang.software.mm.data.record.Record;
+import com.yang.software.mm.data.session.SearchCondition;
 import com.yang.software.mm.web.form.ManuscriptRecordListForm;
 
 public interface ManuscriptDao {
@@ -17,4 +19,6 @@ public interface ManuscriptDao {
     List<ManuscriptRecordListForm> getManuscriptRecordList(int manuscriptId);
 
     void delete(int id);
+
+    List<Manuscript> getManuscripts(SearchCondition condition);
 }

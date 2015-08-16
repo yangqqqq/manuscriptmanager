@@ -1,10 +1,12 @@
 package com.yang.software.mm.web.form;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.yang.software.mm.data.manuscript.Manuscript;
 import utils.StringUtils;
 
 import com.yang.software.mm.data.record.Record;
@@ -13,6 +15,7 @@ import com.yang.software.mm.enums.PublishTimeEnum;
 
 @Entity
 public class ManuscriptListForm {
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Id
     private int id;
 
@@ -46,12 +49,19 @@ public class ManuscriptListForm {
 
     private String remark;
 
+    private Date createDate;
+
     public String getSummary() {
         return StringUtils.getFirstStr(StringUtils.getSummary(content), 40 - remark.length());
     }
 
     public Date getOpDate() {
         return opDate;
+    }
+
+    public String getOpDateStr()
+    {
+        return sdf.format(this.opDate);
     }
 
     public void setOpDate(Date opDate) {
@@ -194,6 +204,17 @@ public class ManuscriptListForm {
         return StringUtils.getFirstStr(count, 8);
     }
 
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+    public String getCreateDateStr()
+    {
+        return sdf.format(createDate);
+    }
     public ManuscriptListForm(Record record) {
         super();
         this.id = record.getId();
@@ -208,6 +229,23 @@ public class ManuscriptListForm {
         this.count = record.getCount();
         this.opType = record.getOpType();
         this.remark = record.getRemark();
+    }
+
+
+    public ManuscriptListForm(Manuscript manuscript) {
+        super();
+        this.id = manuscript.getId();
+        this.manuscriptId = manuscript.getId();
+        this.opDate = manuscript.getOpDate();
+        this.ownerId = manuscript.getOwnerId();
+        this.content = manuscript.getContent();
+        this.factoryId = manuscript.getFactoryId();
+        this.sectionId = manuscript.getSectionId();
+        this.publishTime = manuscript.getPublishTime();
+        this.publishYear = manuscript.getPublishYear();
+        this.count = manuscript.getCount();
+        this.opType = manuscript.getOpType();
+        this.remark = manuscript.getRemark();
     }
 
     public ManuscriptListForm() {

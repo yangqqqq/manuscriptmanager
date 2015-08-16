@@ -134,8 +134,52 @@ function isMatch(searchStr, contentStr)
 window.onload = pageInit;
 function pageInit()
 {
-    sortTable('tableSort', 10);
-    sortTable('tableSort', 10);
+    getManuscriptResult(0);
+}
+function getManuscriptResult(page)
+{
+    $.ajax({
+        url: "./manuscriptListJson?currentPage=" + page,
+        context: document.body,
+        cache:false,
+        success: function(data){
+            if (data.length > 0)
+            {
+                setTableValue(data);
+            }
+            if (page < 1)
+            {
+                getManuscriptResult(page + 1);
+            }
+        }});
+}
+function setTableValue(data)
+{
+    for (var i = 0;i < data.length; i ++)
+    {
+        var manuscript = data[i];
+        var trString = "<tr class='manuTr' onclick=\"manuscriptPreview("+ manuscript.manuscriptId +",this,'"+ manuscript.remark+"')\" ondblclick='manuscriptEditInit("+ manuscript.manuscriptId +")'>";
+        trString += "<td width=\"10px\"><input type=\"checkbox\" name=\"selectId\" class=\"checkbox_selectId\" value=\""+ manuscript.manuscriptId +"\"/></td>";
+        trString += "<td width=\"*%\">";
+        if (manuscript.remark != '')
+        {
+            trString += "<label style=\"color: red\">["+manuscript.remark+"]</label>";
+        }
+        trString += manuscript.summary+"</td>";
+        trString += "<td width=\"150px\">"+manuscript.sectionName+"</td>";
+        trString += "<td width=\"120px\">"+manuscript.countDisplay+"</td>";
+        trString += "<td width=\"70px\">"+manuscript.contentLength+"</td>";
+        trString += "<td width=\"60px\">"+manuscript.ownerName+"</td>";
+        trString += "<td width=\"60px\">"+manuscript.publishYear+"年</td>";
+        trString += "<td width=\"60px\">"+manuscript.publishTimeDescription+"</td>";
+        trString += "<td width=\"60px\">"+manuscript.autherName+"</td>";
+        trString += "<td width=\"60px\">"+manuscript.factoryDescription+"</td>";
+        trString += "<td width=\"170px\">"+manuscript.createDateStr+"</td>";
+        trString += "<td width=\"170px\">"+manuscript.opDateStr+"</td></tr>";
+        $("#tableSort").append(trString);
+    }
+    $("#manuCount").html(parseInt($("#manuCount").html(), 10) + data.length);
+
 }
 function submitAdvice()
 {
@@ -152,11 +196,34 @@ function reset()
     document.form.content.value="";
     document.form.publishTime.value="-1";
     document.form.publishYear.value="-1";
+    document.form.section.value="-1";
 	search2();
 }
 function setWirtable(inputObj)
 {
 	$(inputObj).removeAttr("readonly");
+}
+function realDelete()
+{
+    var selectCheckbox = $(".checkbox_selectId");
+    if (selectCheckbox.length == 0)
+    {
+        alert("请选择一条记录");
+        return false;
+    }
+    for (var i = 0 ; i < selectCheckbox.length; i++)
+    {
+        if (selectCheckbox[i].checked)
+        {
+            var r=confirm("确定吗？")
+            if (r==true)
+            {
+                document.form.action = "./manuscriptDelete?";
+                document.form.submit();
+                return true;
+            }
+        }
+    }
 }
 </script>
 </head>
@@ -169,8 +236,11 @@ function setWirtable(inputObj)
 <c:forEach items="${opTypes }" var="opType">
 <a href="javascript:void(0)" onclick="opTypeChange(${opType.id})">${opType.opString}</a>
 </c:forEach>
-共<label id="manuCount">${fn:length(command)}</label>篇
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<%if ("true".equals(request.getParameter("isRecyle"))){%>
+<a href="javascript:void(0)" onclick="realDelete()">从数据库删除</a>
+    <%}%>
+共<label id="manuCount">0</label>篇
+&nbsp;&nbsp;
 按内容查询<input type="text" name="content" value="${condition.content}"/>
 按栏目查询<select name="section">
         <option value="-1">请选择</option>
@@ -206,37 +276,10 @@ function setWirtable(inputObj)
     <th onclick="sortTable('tableSort', 7)" style="cursor: pointer;">期数</th>
     <th onclick="sortTable('tableSort', 8)" style="cursor: pointer;">作者</th>
     <th onclick="sortTable('tableSort', 9)" style="cursor: pointer;">所在库</th>
-    <th onclick="sortTable('tableSort', 10)" style="cursor: pointer;">最后操作时间</th>
+    <th onclick="sortTable('tableSort', 10)" style="cursor: pointer;">上传时间</th>
+    <th onclick="sortTable('tableSort', 11)" style="cursor: pointer;">最后操作时间</th>
    </tr>
   </thead>
-  <tbody>
-       <c:forEach var="manuscript" items="${command}" > 
-          <tr class="manuTr" onclick="manuscriptPreview(${manuscript.manuscriptId},this,'${manuscript.remark}')" ondblclick="manuscriptEditInit(${manuscript.manuscriptId})">
-          <td width="10px"><input type="checkbox" name="selectId" class="checkbox_selectId" value="${manuscript.manuscriptId}"/>
-          </td>
-          <td width="*%"><c:if test="${manuscript.remark != ''}"><label style="color: red">[${manuscript.remark}]</label></c:if><c:out value="${manuscript.summary}" default="" />
-          </td> 
-          <td width="150px"> <c:out value="${manuscript.sectionName}" default=""/> 
-          </td>
-          <td width="120px"> <c:out value="${manuscript.countDisplay}" default=""/> 
-          </td> 
-          <td width="70px"> <c:out value="${manuscript.contentLength}" default=""/> 
-          </td>
-          <td width="60px"> <c:out value="${manuscript.ownerName}" default=""/> 
-          </td>
-         <td width="60px"> <c:out value="${manuscript.publishYear}年" default=""/> 
-          </td>
-          <td width="60px"> <c:out value="${manuscript.publishTimeDescription}" default=""/> 
-          </td>
-          <td width="60px"> <c:out value="${manuscript.autherName}" default=""/> 
-          </td>     
-          <td width="60px"> <c:out value="${manuscript.factoryDescription}" default=""/> 
-          </td>
-          <td width="170px"> <c:out value="${manuscript.opDate}" default=""/> 
-          </td>
-          </tr> 
-       </c:forEach>
-  </tbody>
  </table>
 </div>
 <table style="width: 90%;margin-top: 10px;margin-left: 0px"><tr><td>

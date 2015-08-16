@@ -1,5 +1,6 @@
 package com.yang.software.mm.web.controller;
 
+import com.yang.software.mm.data.Constants;
 import com.yang.software.mm.data.record.Record;
 import com.yang.software.mm.data.section.Section;
 import com.yang.software.mm.data.session.SessionCache;
@@ -8,12 +9,14 @@ import com.yang.software.mm.data.user.User;
 import com.yang.software.mm.enums.FactoryTypeEnum;
 import com.yang.software.mm.enums.MmOpTypeEnum;
 import com.yang.software.mm.enums.RoleEnum;
+import com.yang.software.mm.frame.Page;
 import com.yang.software.mm.service.ManuscriptService;
 import com.yang.software.mm.service.SectionService;
 import com.yang.software.mm.service.UserService;
 import com.yang.software.mm.web.form.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import utils.StringUtils;
@@ -168,6 +171,14 @@ public class ManuscriptController{
         return new ModelAndView("redirect:/manuscriptList");
     }
 
+    @RequestMapping(value = "manuscriptDelete")
+    public ModelAndView manuscriptDelete(HttpServletRequest request,
+                                         HttpServletResponse response, ManuscriptOpForm form) {
+        realDeleteManuscript(form.getSelectId());
+
+        return new ModelAndView("redirect:/manuscriptList");
+    }
+
     @RequestMapping(value = "manuscriptDeliverInit")
     public ModelAndView manuscriptDeliverInit(HttpServletRequest request,
                                               HttpServletResponse response) {
@@ -271,16 +282,26 @@ public class ManuscriptController{
     public ModelAndView manuscriptList(HttpServletRequest request,
                                                HttpServletResponse response) {
         resetSearchCondtion(request);
-        List<ManuscriptListForm> result = filterRecyle(manuscriptService.getManuscriptList(SessionCache.getSessionValue().getSearchCondition()));
+        //List<ManuscriptListForm> result = filterRecyle(manuscriptService.getManuscriptList(SessionCache.getSessionValue().getSearchCondition()));
 
         Map<String, Object> commandMap = new HashMap<String, Object>();
         commandMap.put("opTypes", RoleEnum.getMmOpTypeEnumOfAll(0));
-        commandMap.put("command", result);
+        //commandMap.put("command", result);
         List<Section> sections = sectionService.getAll();
         commandMap.put("sections", sections);
         commandMap.put("publishYear", this.getPublishYears());
         commandMap.put("condition", SessionCache.getSessionValue().getSearchCondition());
         return new ModelAndView("../../jsp/manuscript/ManuscriptMainList", commandMap);
+    }
+    @RequestMapping(value = "manuscriptListJson")
+    public @ResponseBody List<ManuscriptListForm> manuscriptList(HttpServletRequest request) {
+        int currentPage = Integer.valueOf(request.getParameter("currentPage"));
+        Page page = new Page();
+        page.setCurrentPage(currentPage);
+        Constants.page.set(page);
+        List<ManuscriptListForm> result = filterRecyle(manuscriptService.getManuscriptList(SessionCache.getSessionValue().getSearchCondition()));
+
+        return result;
     }
 
     private List<ManuscriptListForm> filterRecyle(List<ManuscriptListForm> manuscriptListForms) {
@@ -300,6 +321,17 @@ public class ManuscriptController{
     private void deleteManuscript(String[] ids) {
         for (String id : ids) {
             manuscriptService.delete(Integer.valueOf(id));
+        }
+    }
+
+    /**
+     * 区别delete,本方法是在数据库中删除数据
+     * @param ids
+     */
+    private void realDeleteManuscript(String[] ids)
+    {
+        for (String id : ids) {
+            manuscriptService.realDelete(Integer.valueOf(id));
         }
     }
 

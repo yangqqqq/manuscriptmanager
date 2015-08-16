@@ -26,6 +26,7 @@ public class SearchCondition {
     private String[] factoryIds = new String[]{String.valueOf(FactoryTypeEnum.EDIT_ID), String.valueOf(FactoryTypeEnum.WAIT_PUBLISH_ID), String.valueOf(FactoryTypeEnum.WAIT_PUBLISH_ID)};
     private boolean isRecyle = false;
 
+    private String manuscriptId = Constants.NOT_INIT_NUMBER_STR;
     public SearchCondition() {
     }
 
@@ -104,6 +105,14 @@ public class SearchCondition {
                 ", publishYear='" + publishYear + '\'' +
                 ", ownerId='" + ownerId + '\'' +
                 '}';
+    }
+
+    public String getManuscriptId() {
+        return manuscriptId;
+    }
+
+    public void setManuscriptId(String manuscriptId) {
+        this.manuscriptId = manuscriptId;
     }
 
     public Record getSearchRecordCondtion()

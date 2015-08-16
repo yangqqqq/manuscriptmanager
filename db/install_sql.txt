@@ -60,3 +60,26 @@ UPDATE `manuscript`.`section` SET `id`='0' WHERE `id`='1';
 
 ALTER TABLE `manuscript`.`section` 
 ADD COLUMN `hidden` INT(1) NOT NULL AFTER `sectionName`;
+
+ALTER TABLE `manuscript`.`manuscript`
+ADD COLUMN  `operid` INT NOT NULL,
+ADD COLUMN  `ownerid` INT NOT NULL,
+ADD COLUMN  `optype` INT NOT NULL,
+ADD COLUMN  `content` LONGTEXT NOT NULL,
+ADD COLUMN  `lastopid` INT NOT NULL,
+ADD COLUMN  `opdate` DATETIME default '2014-06-10 08:25:02' NOT NULL,
+ADD COLUMN  `factoryid` INT NOT NULL,
+ADD COLUMN  `sectionId` INT NOT NULL,
+ADD COLUMN  `publishTime` INT NOT NULL,
+ADD COLUMN `publishYear` INT NOT NULL AFTER `publishTime`,
+ADD COLUMN `count` VARCHAR(100) NOT NULL AFTER `publishYear`,
+ADD COLUMN `remark` VARCHAR(500) NOT NULL AFTER `count`;
+
+ALTER TABLE `manuscript`.`manuscript`
+DROP INDEX `index` ,
+ADD INDEX `index` (`id` ASC, `opdate` ASC, `ownerid` ASC, `sectionId` ASC, `factoryid` ASC, `optype` ASC, `publishTime` ASC, `publishYear` ASC);
+
+ALTER TABLE `manuscript`.`record`
+DROP INDEX `index` ,
+ADD INDEX `index` (`manuscriptId` ASC, `opdate` ASC, `id` ASC);
+

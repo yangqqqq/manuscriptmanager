@@ -1,5 +1,7 @@
 package com.yang.software.mm.data;
 
+import com.yang.software.mm.frame.Page;
+
 public interface Constants {
     String SEARCH_CONDITION_SPLIT = "%-%";
 
@@ -10,4 +12,6 @@ public interface Constants {
     String EDIT_WAIT_PUBLISH_FACTORYID_FILTER = "factoryId=1&factoryId=2&factoryId=3";
 
     String ALL_FACTORYID_FILTER = "factoryId=1&factoryId=2&factoryId=3&factoryId=4";
+
+    ThreadLocal<Page> page = new ThreadLocal<Page>();
 }

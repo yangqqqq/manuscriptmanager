@@ -13,6 +13,9 @@
   <tr>
     <td height="83"><a target="mainFrame" href="./sectionMain">栏目管理</a></td>
   </tr>
+    <tr>
+        <td height="83"><a target="mainFrame" href="./resetManuscript">初始化数据</a></td>
+    </tr>
 </table>
 </body>
 </html>

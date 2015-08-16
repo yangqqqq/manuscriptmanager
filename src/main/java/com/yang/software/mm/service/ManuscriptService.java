@@ -17,6 +17,8 @@ public interface ManuscriptService {
 
     void delete(int id);
 
+    void realDelete(int id);
+
     void get(int id);
 
     void deliver(int manuscriptId, int toUserId);
@@ -38,4 +40,6 @@ public interface ManuscriptService {
     List<ManuscriptListForm> getManuscriptListOfFactory(int factoryId, int manuscriptListType);
 
     List<ManuscriptListForm> getManuscriptList(SearchCondition searchCondition);
+
+    void resetManuscript();
 }

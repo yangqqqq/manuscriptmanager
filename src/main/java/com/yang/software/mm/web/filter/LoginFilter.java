@@ -15,7 +15,7 @@ import com.yang.software.mm.data.session.SessionCache;
 
 public class LoginFilter implements Filter {
 
-    private final static String LOGIN_URL = "/manuscriptmanager/jsp/login/login.jsp";
+    private final static String LOGIN_URL = "/jsp/login/login.jsp";
 
     public void destroy() {
 
@@ -30,11 +30,11 @@ public class LoginFilter implements Filter {
         System.out.println(servletRequest.getRequestURL());
         SessionCache.sessionId.set(sessionId);
 
-        if (servletRequest.getRequestURI().equals(LoginFilter.LOGIN_URL)
-                || servletRequest.getRequestURI().equals("/manuscriptmanager/login")
-                || servletRequest.getRequestURI().startsWith("/manuscriptmanager/image")
-                || servletRequest.getRequestURI().startsWith("/manuscriptmanager/js")
-                || servletRequest.getRequestURI().startsWith("/manuscriptmanager/css")) {
+        if (servletRequest.getServletPath().equals(LoginFilter.LOGIN_URL)
+                || servletRequest.getServletPath().equals("/login")
+                || servletRequest.getServletPath().startsWith("/image/")
+                || servletRequest.getServletPath().startsWith("/js/")
+                || servletRequest.getServletPath().startsWith("/manuscriptmanager/css/")) {
             chain.doFilter(request, response);
             return;
         }

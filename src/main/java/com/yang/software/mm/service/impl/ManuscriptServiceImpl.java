@@ -2,6 +2,7 @@ package com.yang.software.mm.service.impl;
 
 import java.util.*;
 
+import com.yang.software.mm.data.Constants;
 import com.yang.software.mm.data.session.SearchCondition;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -76,6 +77,8 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         int newId = manuscriptDao.add(manuscript);
         Record record = manuscriptForm.getAddRecord(newId);
         recordDao.add(record);
+        manuscript.setRecord(record);
+        manuscriptDao.modify(manuscript);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -85,6 +88,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setLastOpId(latestRecord.getId());
         newRecord.setRemark(latestRecord.getRemark());
         recordDao.add(newRecord);
+        Manuscript manuscript = manuscriptDao.getManuscript(manuscriptForm.getManuscriptId());
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -96,6 +102,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setOperId(SessionCache.getSessionValue().getUserId());
         newRecord.setRemark(manuscriptForm.getRemark());
         recordDao.add(newRecord);
+        Manuscript manuscript = manuscriptDao.getManuscript(manuscriptForm.getManuscriptId());
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -108,6 +117,20 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setOperId(SessionCache.getSessionValue().getUserId());
         newRecord.setOwnerId(latestRecord.getOwnerId());
         recordDao.add(newRecord);
+        Manuscript manuscript = manuscriptDao.getManuscript(id);
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+    public void realDelete(int id) {
+        List<ManuscriptRecordListForm> list = manuscriptDao.getManuscriptRecordList(id);
+        for (ManuscriptRecordListForm m : list)
+        {
+            recordDao.delete(m.getRecordId());
+        }
+        manuscriptDao.delete(id);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -120,6 +143,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setOperId(SessionCache.getSessionValue().getUserId());
         newRecord.setOwnerId(SessionCache.getSessionValue().getUserId());
         recordDao.add(newRecord);
+        Manuscript manuscript = manuscriptDao.getManuscript(id);
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -132,6 +158,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setOperId(SessionCache.getSessionValue().getUserId());
         newRecord.setOwnerId(toUserId);
         recordDao.add(newRecord);
+        Manuscript manuscript = manuscriptDao.getManuscript(manuscriptId);
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -144,7 +173,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setOpDate(new Date());
         newRecord.setOperId(SessionCache.getSessionValue().getUserId());
         recordDao.add(newRecord);
-
+        Manuscript manuscript = manuscriptDao.getManuscript(manuscriptId);
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
@@ -196,9 +227,11 @@ public class ManuscriptServiceImpl implements ManuscriptService {
     }
 
     public ManuscriptListForm getManuscript(int manuscriptId) {
-        Record condition = Record.getSearchCondition();
-        condition.setManuscriptId(manuscriptId);
-        List<ManuscriptListForm> forms = this.getManuscriptList(condition);
+        SearchCondition searchCondition = new SearchCondition();
+        searchCondition.setManuscriptId(String.valueOf(manuscriptId));
+        searchCondition.setFactoryIds(null);
+        searchCondition.setPublishYear(Constants.NOT_INIT_NUMBER_STR);
+        List<ManuscriptListForm> forms = this.getManuscriptList(searchCondition);
         if (!forms.isEmpty())
         {
             return forms.get(0);
@@ -236,6 +269,7 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         return reslut;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     public void period(int manuscriptId, int periodId) {
         Record latestRecord = getLatestRecord(manuscriptId);
         Record newRecord = latestRecord.getOpCopy();
@@ -245,6 +279,9 @@ public class ManuscriptServiceImpl implements ManuscriptService {
         newRecord.setOpDate(new Date());
         newRecord.setOperId(SessionCache.getSessionValue().getUserId());
         recordDao.add(newRecord);
+        Manuscript manuscript = manuscriptDao.getManuscript(manuscriptId);
+        manuscript.setRecord(newRecord);
+        manuscriptDao.modify(manuscript);
     }
 
     private String getSectionName(int sectionId, List<Section> sections) {
@@ -277,33 +314,41 @@ public class ManuscriptServiceImpl implements ManuscriptService {
 
     @Override
     public List<ManuscriptListForm> getManuscriptList(SearchCondition searchCondition) {
-        List <ManuscriptListForm> list = this.getManuscriptList(searchCondition.getSearchRecordCondtion());
-        List <ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
-        Set<Integer> factoryIdSet = searchCondition.getFactoryIdSet();
-        for (ManuscriptListForm form : list) {
-            if (factoryIdSet.contains(form.getFactoryId()))
-            {
-                result.add(form);
-            }
+        List<Manuscript> manuscripts = manuscriptDao.getManuscripts(searchCondition);
+        List<User> users = userDao.getAllUser();
+        List<Section> sections = sectionDao.getAllSection();
+        List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
+        for (Manuscript manuscript : manuscripts) {
+            ManuscriptListForm form = new ManuscriptListForm(manuscript);
+            form.setAutherId(manuscript.getUserId());
+            form.setAutherName(getUserName(users, form.getAutherId()));
+            form.setOwnerName(getUserName(users, form.getOwnerId()));
+            form.setSectionName(getSectionName(form.getSectionId(), sections));
+            form.setCreateDate(manuscript.getDate());
+            result.add(form);
         }
         return result;
     }
 
-    private List<ManuscriptListForm> getManuscriptList(Record searchCondition)
-    {
-        Map<Integer, Manuscript> manuscripts = this.getId2ManuscriptMap(manuscriptDao.getAllManuscript());
-        List<Record> records = recordDao.getRecords(searchCondition);
-        List<User> users = userDao.getAllUser();
-        List<Section> sections = sectionDao.getAllSection();
-        List<ManuscriptListForm> result = new ArrayList<ManuscriptListForm>();
-        for (Record record : records) {
-            ManuscriptListForm form = new ManuscriptListForm(record);
-            form.setAutherId(manuscripts.get(record.getManuscriptId()).getUserId());
-            form.setAutherName(getUserName(users, form.getAutherId()));
-            form.setOwnerName(getUserName(users, form.getOwnerId()));
-            form.setSectionName(getSectionName(form.getSectionId(), sections));
-            result.add(form);
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+    public void resetManuscript() {
+        List<Record> records = recordDao.getRecords(Record.getSearchCondition());
+        List<Manuscript> manuscripts = manuscriptDao.getAllManuscript();
+        Map<Integer, Record> map = new HashMap<Integer, Record>();
+        for (Record record : records)
+        {
+            map.put(record.getManuscriptId(), record);
         }
-        return result;
+        for (Manuscript manuscript: manuscripts)
+        {
+
+            Record old = map.get(manuscript.getId());
+            if (old != null) {
+                manuscript.setRecord(old);
+                manuscriptDao.modify(manuscript);
+            }
+        }
     }
 }

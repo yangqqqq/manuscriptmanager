@@ -1,6 +1,7 @@
 package com.yang.software.mm.web.controller;
 
 import com.yang.software.mm.data.user.User;
+import com.yang.software.mm.service.ManuscriptService;
 import com.yang.software.mm.service.UserService;
 import com.yang.software.mm.web.form.UserForm;
 import org.springframework.stereotype.Controller;
@@ -17,12 +18,23 @@ public class UserController{
     @Resource(name = "userService")
     private UserService userService;
 
+    @Resource(name = "manuscriptService")
+    private ManuscriptService manuscriptService;
+
     public UserService getUserService() {
         return userService;
     }
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public ManuscriptService getManuscriptService() {
+        return manuscriptService;
+    }
+
+    public void setManuscriptService(ManuscriptService manuscriptService) {
+        this.manuscriptService = manuscriptService;
     }
 
     @RequestMapping(value = "userMain")
@@ -68,5 +80,15 @@ public class UserController{
 
         return new ModelAndView("redirect:/userMain");
     }
+
+    @RequestMapping(value = "resetManuscript")
+    public ModelAndView resetManuscript(HttpServletRequest request,
+                                 HttpServletResponse response, UserForm command) {
+
+        manuscriptService.resetManuscript();
+
+        return new ModelAndView("redirect:/userMain");
+    }
+
 
 }
